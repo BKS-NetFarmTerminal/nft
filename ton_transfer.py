@@ -11,7 +11,6 @@ async def massage_and_gift(destination_address, characteristic, nft_type, is_tes
         link_to_nft = f'"https://testnet.tonviewer.com/{nft_address}"'
     else:
         link_to_nft = f'"https://tonviewer.com/{nft_address}"'
-
     comment = f"Here is your {characteristic} {nft_type}: {link_to_nft} And some money as a gift! With respect, your Network Farm Terminal"
 
     client = LiteserverClient(is_testnet=is_testnet)

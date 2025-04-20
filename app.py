@@ -5,15 +5,6 @@ from make_nft import make_nft_please
 
 app = Flask(__name__)
 
-# Пример данных
-data = {"message": "Привет, мир!"}
-
-# Главная страница
-@app.route('/')
-def index():
-    return "Добро пожаловать в API!"
-
-# POST запрос
 @app.route('/mint_nft', methods=['POST'])
 async def post_example():
     """

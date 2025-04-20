@@ -1,5 +1,3 @@
-import asyncio
-
 from mint_nft import mint_nft
 from ton_transfer import massage_and_gift
 
@@ -9,6 +7,7 @@ import os
 load_dotenv()
 
 import aiohttp
+
 async def fetch_data(nft_type):
     async with aiohttp.ClientSession() as session:
         async with session.get(os.getenv("IMG_GEN_API")+nft_type) as response:
@@ -21,6 +20,7 @@ async def fetch_data(nft_type):
             else:
                 print("ошибка:", response.status)
 
+
 async def make_nft_please(nft_type, user_address):
 
     [img, characteristic] = await fetch_data(nft_type)
@@ -32,6 +32,7 @@ async def make_nft_please(nft_type, user_address):
     result = await massage_and_gift(user_address, characteristic, nft_type, is_testnet, nft_address)
     print(nft_address)
     print(result)
+    
     if is_testnet:
         link_to_nft = f'https://testnet.tonviewer.com/{nft_address}'
     else:

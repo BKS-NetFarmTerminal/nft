@@ -1,5 +1,4 @@
 from tonutils.client import LiteserverClient
-from tonutils.utils import to_nano
 from tonutils.wallet import WalletV4R2
 from tonutils.nft import CollectionEditableModified
 from tonutils.nft.content import CollectionModifiedOnchainContent
