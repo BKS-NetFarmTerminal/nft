@@ -6,57 +6,49 @@ from tonutils.nft import CollectionEditableModified, NFTEditableModified
 from tonutils.nft.content import NFTModifiedOnchainContent
 from tonutils.wallet import WalletV4R2
 
+
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # подгружает переменные из .env
-
-IS_TESTNET = os.getenv("IS_TESTNET") == "True"
-MNEMONIC: list[str] = os.getenv('MNEMONIC').split()
-COLLECTION_ADDRESS = os.getenv("COLLECTION_ADDRESS")
+load_dotenv()
 
 
+async def mint_nft(characteristic, nft_type, img, is_testnet, new_owner_address):
 
-obj = {
-    "characteristic": "Useful hateful",
-    "type" : "carrot", #carrot/turnip/pig
-    "img" : "https://raw.githubusercontent.com/MarchelloLemonchello/NFT-collection/refs/heads/main/output5.png" 
+    client = LiteserverClient(is_testnet=is_testnet)
 
-}
+    collection_info = await client.run_get_method(os.getenv("COLLECTION_ADDRESS"), "get_collection_data")
+    index = collection_info[0]
 
-CURRENT_NFT_INDEX = -1
-CURRENT_NFT_INDEX += 1
-
-async def main() -> None:
-    client = LiteserverClient(is_testnet=IS_TESTNET)
-    wallet, _, _, _ = WalletV4R2.from_mnemonic(client, MNEMONIC)
+    wallet, _, _, _ = WalletV4R2.from_mnemonic(client, os.getenv('MNEMONIC_MINTER').split())
 
     nft = NFTEditableModified(
-        index=CURRENT_NFT_INDEX,
-        collection_address=Address(COLLECTION_ADDRESS),
+        index=index,
+        collection_address=Address(os.getenv("COLLECTION_ADDRESS")),
     )
     body = CollectionEditableModified.build_mint_body(
-        index=CURRENT_NFT_INDEX,
-        owner_address=Address(wallet.address),
+        index=index,
+        owner_address=new_owner_address,
         content=NFTModifiedOnchainContent(
-            name=obj["characteristic"] + " " + obj["type"],
-            description=f"Non-Fungible Token confirming your rights to own a unique, unrepeatable virtual {obj['type']} from Network Farm Terminal. In short: NFT from NFT",
-            image=obj["img"],
+            name=characteristic + " " + nft_type,
+            description=f"Non-Fungible Token confirming your rights to own a unique, unrepeatable virtual {nft_type} from Network Farm Terminal. In short: NFT from NFT",
+            image=img,
         ),
+        # forward_payload=(
+        #     begin_cell()
+        #     .store_uint(0, 32)
+        #     .store_snake_string(comment)
+        #     .end_cell()
+        # ),
     )
 
     tx_hash = await wallet.transfer(
-        destination=COLLECTION_ADDRESS,
-        amount=0.02,
+        destination=os.getenv("COLLECTION_ADDRESS"),
+        amount=0.1,
         body=body,
     )
-
-    print(f"Successfully minted NFT with index {CURRENT_NFT_INDEX}: {nft.address.to_str()}")
+    nft_addr = await client.run_get_method(os.getenv("COLLECTION_ADDRESS"), "get_nft_address_by_index", stack=[index])
+    nft_addr = f"{nft_addr[0]}"[8:-1]
+    print(f"Successfully minted NFT with index {index}: {nft_addr}")
     print(f"Transaction hash: {tx_hash}")
-
-
-if __name__ == "__main__":
-    import asyncio
-
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    asyncio.run(main())
+    return nft_addr

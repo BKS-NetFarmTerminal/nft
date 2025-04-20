@@ -4,14 +4,13 @@ from tonutils.wallet import WalletV4R2
 from tonutils.nft import CollectionEditableModified
 from tonutils.nft.content import CollectionModifiedOnchainContent
 from tonutils.nft.royalty_params import RoyaltyParams
-
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # подгружает переменные из .env
+load_dotenv()
 
 IS_TESTNET = os.getenv("IS_TESTNET") == "True"
-MNEMONIC: list[str] = os.getenv('MNEMONIC').split()
+MNEMONIC: list[str] = os.getenv('MNEMONIC_MINTER').split()
 
 async def main() -> None:
     client = LiteserverClient(is_testnet=IS_TESTNET)
@@ -22,9 +21,9 @@ async def main() -> None:
         owner_address=wallet.address,
         next_item_index=0,
         content=CollectionModifiedOnchainContent(
-            name="Network Farm Terminal ledger test1",
+            name="Network Farm Terminal ledger",         #название
             description="Non-Fungible Tokens that confirm the property of Network Farm Terminal farmers, such as unique, unrepeatable, animals and plants grown by their hands, namely, fingers typing code on a keyboard in a terminal",
-            image="https://ibb.co/wNSDyqWs",
+            image="https://raw.githubusercontent.com/BKS-NetFarmTerminal/BKS-NetFarmFrontend/refs/heads/main/public/Logo.png",
         ),
         royalty_params=RoyaltyParams(
             base=1000,

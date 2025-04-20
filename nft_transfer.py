@@ -10,47 +10,48 @@ load_dotenv()  # подгружает переменные из .env
 
 
 # Set to True for test network, False for main network
-IS_TESTNET = os.getenv("IS_TESTNET") == "True"
-MNEMONIC: list[str] = os.getenv('MNEMONIC').split()
+IS_TESTNETc = os.getenv("IS_TESTNET") == "True"
+MNEMONICc: list[str] = os.getenv('MNEMONIC').split()
 
 # Address of the NFT to be transferred and the new owner address
 
-obj = {
+objj = {
     "user_address": "0QCHMichcLkuC5OHon0YTBDGMaNdTNbBB2kS2LnZ9a8lExBa",
     "NFT_address": "kQA6XjzFS9xLFNL0Ph2OwV5rcbczYAwBTP7OPNTD7XcvuV3v"
 }
 
 
-NFT_ADDRESS = obj["NFT_address"]
-NEW_OWNER_ADDRESS = obj["user_address"]
+
 
 # Optional comment to include in the forward payload
-COMMENT = "Hello from tonutils!"
 
 
-async def main() -> None:
-    client = LiteserverClient(is_testnet=IS_TESTNET)
-    wallet, _, _, _ = WalletV4R2.from_mnemonic(client, MNEMONIC)
+
+async def nft_transfer(new_owner_address, nft_address, is_testnet,):
+    comment = "hi!"
+    client = LiteserverClient(is_testnet=is_testnet)
+    wallet, _, _, _ = WalletV4R2.from_mnemonic(client, os.getenv('MNEMONIC').split())
 
     body = NFTStandard.build_transfer_body(
-        new_owner_address=Address(NEW_OWNER_ADDRESS),
+        new_owner_address=Address(new_owner_address),
         forward_payload=(
             begin_cell()
             .store_uint(0, 32)
-            .store_snake_string(COMMENT)
+            .store_snake_string(comment)
             .end_cell()
         ),
         forward_amount=1,
     )
 
     tx_hash = await wallet.transfer(
-        destination=NFT_ADDRESS,
+        destination=nft_address,
         amount=0.05,
         body=body,
     )
 
-    print(f"Successfully transferred NFT from address {NFT_ADDRESS} to new owner {NEW_OWNER_ADDRESS}.")
+    print(f"Successfully transferred NFT from address {nft_address} to new owner {new_owner_address}.")
     print(f"Transaction hash: {tx_hash}")
+    return "success"
 
 
 if __name__ == "__main__":
